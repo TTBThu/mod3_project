@@ -48,8 +48,28 @@ public class AccountManager {
     private void displayAccounts() {
         List<Account> accounts = accountDAO.getAllAccounts();
         ConsoleView.displayMessage("Danh sách tài khoản:");
-        for (Account account : accounts) {
-            ConsoleView.displayMessage(account.toString());
+
+        int startIndex = 0;
+        int endIndex = Math.min(startIndex + 10, accounts.size());
+        boolean viewingMore = true;
+
+        while (viewingMore) {
+            for (int i = startIndex; i < endIndex; i++) {
+                ConsoleView.displayMessage(accounts.get(i).toString());
+            }
+
+            if (endIndex < accounts.size()) {
+                ConsoleView.displayMessage("Nhấn Enter để xem tiếp hoặc nhập 0 để thoát:");
+                String input = scanner.nextLine();
+                if (input.equals("0")) {
+                    viewingMore = false;
+                } else {
+                    startIndex = endIndex;
+                    endIndex = Math.min(startIndex + 10, accounts.size());
+                }
+            } else {
+                viewingMore = false;
+            }
         }
     }
 

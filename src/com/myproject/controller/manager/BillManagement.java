@@ -1,14 +1,15 @@
 package com.myproject.controller.manager;
 
-import com.myproject.controller.manager.*;
-import com.myproject.dao.*;
+import com.myproject.dao.BillDAO;
+import com.myproject.dao.util.BillDAOImpl;
 import com.myproject.dao.util.BillType;
-import java.util.Date;
-
 import com.myproject.dao.util.Manager;
 import com.myproject.view.ConsoleView;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
 public class BillManagement implements Manager {
     private BillDAO billDAO;
 
@@ -57,19 +58,32 @@ public class BillManagement implements Manager {
         String billCode = ConsoleView.getInput("Mã phiếu 入力:");
         boolean billType = BillType.EXPORT;
         String empIdCreated = ConsoleView.getInput("Mã nhân viên tạo phiếu 入力:");
-        String empIdAuth = ConsoleView.getInput("Mã nhân viên duyệt phiếu 入力:");
+        String empIdAuth = "";
         Date created = new Date();
         byte billStatus = 0;
         if (billDAO.employeeExists(empIdCreated)) {
             Bill bill = new Bill(billCode, billType, empIdCreated, created, empIdAuth, billStatus);
+
+            // Kiểm tra và khởi tạo danh sách chi tiết nếu cần
+            if (bill.getDetails() == null) {
+                bill.setDetails(new ArrayList<>());
+            }
+
             int numberOfDetails = ConsoleView.getIntInput("Số lượng chi tiết phiếu xuất 入力:");
             for (int i = 0; i < numberOfDetails; i++) {
                 String productId = ConsoleView.getInput("Mã sản phẩm 入力:");
                 int quantity = ConsoleView.getIntInput("Số lượng 入力:");
                 float price = ConsoleView.getFloatInput("Giá 入力:");
                 BillDetails details = new BillDetails(0, 0, productId, quantity, price);
+
+                // Đảm bảo danh sách chi tiết không null
+                if (bill.getDetails() == null) {
+                    bill.setDetails(new ArrayList<>());
+                }
+
                 bill.getDetails().add(details);
             }
+
             boolean success = billDAO.create(bill);
             if (success) {
                 ConsoleView.displayMessage("Tạo phiếu xuất 完了.");
@@ -142,7 +156,7 @@ public class BillManagement implements Manager {
         if (bill != null) {
             if (bill.getBillStatus() == 0) {
                 // Chuyển trạng thái từ "tạo" thành "duyệt"
-                bill.setBillStatus((byte) 1);
+                bill.setBillStatus((byte) 2);
                 boolean success = billDAO.updateReceipt(bill);
                 if (success) {
                     ConsoleView.displayMessage("Duyệt phiếu xuất thành công.");

@@ -1,6 +1,7 @@
 package com.myproject.controller;
 
 import com.myproject.dao.*;
+import com.myproject.dao.util.BillDAOImpl;
 import com.myproject.model.*;
 import com.myproject.dao.util.Manager;
 import com.myproject.view.ConsoleView;
@@ -63,10 +64,14 @@ public class AdminController implements Manager {
                     receiptManagement.run();
                     break;
                 case 5:
+                    BillDAO billDAO = new BillDAOImpl(connection);
+                    BillManagement billManagement = new BillManagement(billDAO);
                     billManagement.run();
                     break;
                 case 6:
-                    reportManagement.run(); // Thêm xử lý cho ReportManagement
+                    ReportDAO reportDAO = new ReportDAO(connection);
+                    ReportManagement reportManagement = new ReportManagement(reportDAO);
+                    reportManagement.run();
                     break;
                 case 7:
                     ConsoleView.displayMessage("Đã thoát khỏi chương trình.");

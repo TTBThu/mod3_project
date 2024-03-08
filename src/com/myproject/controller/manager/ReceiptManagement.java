@@ -3,6 +3,9 @@ package com.myproject.controller.manager;
 import com.myproject.controller.manager.*;
 import com.myproject.dao.*;
 import com.myproject.dao.util.BillType;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.Date;
 
 import com.myproject.dao.util.Manager;
@@ -64,7 +67,7 @@ public class ReceiptManagement implements Manager {
         String billCode = ConsoleView.getInput("Mã phiếu 入力:");
         boolean billType = BillType.IMPORT; // Sử dụng hằng số từ interface BillType
         String empIdCreated = ConsoleView.getInput("Mã nhân viên tạo phiếu 入力:");
-        String empIdAuth = ConsoleView.getInput("Mã nhân viên duyệt phiếu 入力:");
+        String empIdAuth = "";
         Date created = new Date();
         // Mặc định trạng thái là Tạo (0)
         byte billStatus = 0;
@@ -187,8 +190,11 @@ public class ReceiptManagement implements Manager {
                     receipt.setAuthDate(new Date()); // Cập nhật ngày duyệt là ngày hiện tại
                     boolean success = receiptDAO.updateReceipt(receipt);
                     if (success) {
-                        // Cập nhật số lượng sản phẩm trong kho cho từng chi tiết phiếu nhập
+                        // Cập nhật trạng thái và số lượng sản phẩm trong bảng BILL_DETAIL và Product
                         for (BillDetails detail : receipt.getDetails()) {
+                            // Cập nhật trạng thái của chi tiết phiếu nhập trong bảng BILL_DETAIL
+                            receiptDAO.updateBillDetailStatus(receipt.getBillCode(), (byte) 2);
+                            // Cập nhật số lượng sản phẩm trong bảng Product
                             receiptDAO.updateProductQuantity(detail);
                         }
                         ConsoleView.displayMessage("Duyệt phiếu nhập 完了.");

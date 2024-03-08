@@ -51,11 +51,29 @@ public class ProductManagement implements Manager {
 
     private void displayProductList() {
         try {
-            List<Product> productList = productDAO.getAllProducts();
-            System.out.println("Danh sách sản phẩm:");
-            for (Product product : productList) {
-                System.out.println(product.getProductId() + " - " + product.getProductName() + ": " + product.getQuantity() + " " + product.isProductStatus());
-            }
+            int offset = 0;
+            boolean viewingMore = true;
+
+            do {
+                List<Product> productList = productDAO.getAllProducts(offset, 10);
+                System.out.println("Danh sách sản phẩm:");
+                for (Product product : productList) {
+                    System.out.println(product.getProductId() + " - " + product.getProductName() + ": " + product.getQuantity() + " " + product.isProductStatus());
+                }
+
+                if (productList.size() == 10) {
+                    System.out.print("Nhấn Enter để xem tiếp hoặc nhập 0 để thoát:");
+                    String input = scanner.nextLine();
+                    if (input.equals("0")) {
+                        viewingMore = false;
+                    } else {
+                        offset += 10;
+                    }
+                } else {
+                    viewingMore = false;
+                }
+            } while (viewingMore);
+
         } catch (SQLException e) {
             e.printStackTrace();
         }

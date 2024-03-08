@@ -26,7 +26,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 0 " +
+                "WHERE b.Bill_Type = 1 " +
                 "AND YEAR(b.Created) = ? " +
                 "AND MONTH(b.Created) = ? " +
                 "AND DAY(b.Created) = ?";
@@ -52,7 +52,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 0 " +
+                "WHERE b.Bill_Type = 1 " +
                 "AND b.Created BETWEEN ? AND ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, startDate);
@@ -75,7 +75,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 1 " +
+                "WHERE b.Bill_Type = 0 " +
                 "AND YEAR(b.Created) = ? " +
                 "AND MONTH(b.Created) = ? " +
                 "AND DAY(b.Created) = ?";
@@ -101,7 +101,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 1 " +
+                "WHERE b.Bill_Type = 0 " +
                 "AND b.Created BETWEEN ? AND ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setString(1, startDate);
@@ -145,7 +145,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 0 " +
+                "WHERE b.Bill_Type = 1 " +
                 "AND b.Created BETWEEN ? AND ? " +
                 "GROUP BY p.Product_Id " +
                 "ORDER BY SUM(bd.Quantity) DESC " +
@@ -175,7 +175,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 0 " +
+                "WHERE b.Bill_Type = 1 " +
                 "AND b.Created BETWEEN ? AND ? " +
                 "GROUP BY p.Product_Id " +
                 "ORDER BY SUM(bd.Quantity) ASC " +
@@ -205,7 +205,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 1 " +
+                "WHERE b.Bill_Type = 0 " +
                 "AND b.Created BETWEEN ? AND ? " +
                 "GROUP BY p.Product_Id " +
                 "ORDER BY SUM(bd.Quantity) DESC " +
@@ -235,7 +235,7 @@ public class ReportDAO {
                 "FROM PRODUCT p " +
                 "JOIN BILL_DETAIL bd ON p.Product_Id = bd.Product_Id " +
                 "JOIN BILL b ON bd.Bill_Id = b.Bill_id " +
-                "WHERE b.Bill_Type = 1 " +
+                "WHERE b.Bill_Type = 0 " +
                 "AND b.Created BETWEEN ? AND ? " +
                 "GROUP BY p.Product_Id " +
                 "ORDER BY SUM(bd.Quantity) ASC " +

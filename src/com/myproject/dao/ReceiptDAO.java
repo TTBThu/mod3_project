@@ -3,6 +3,7 @@ package com.myproject.dao;
 import com.myproject.controller.manager.Bill;
 import com.myproject.controller.manager.BillDetails;
 import com.myproject.dao.util.Manager;
+import com.myproject.dao.*;
 import com.myproject.view.ConsoleView;
 
 import java.sql.*;
@@ -22,7 +23,10 @@ public class ReceiptDAO{
             long billId = Long.parseLong(keyword);
             // Lấy thông tin của một phiếu nhập dựa trên mã phiếu nhập
             String sql = "SELECT * FROM bill WHERE Bill_Id = ?";
+            String getDetailSQL = "SELECT * FROM bill_detail WHERE Bill_Id = ?";
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                PreparedStatement getListDetail = connection.prepareStatement(getDetailSQL);
+                List<BillDetails> billDetails = new ArrayList<>();
                 ps.setLong(1, billId);
                 ResultSet rs = ps.executeQuery();
                 if (rs.next()) {
@@ -32,7 +36,25 @@ public class ReceiptDAO{
                     java.util.Date created = rs.getDate("Created");
                     String empIdAuth = rs.getString("Emp_id_auth");
                     byte billStatus = rs.getByte("Bill_Status");
-                    return new Bill(billCode, billType, empIdCreated, created, empIdAuth, billStatus);
+
+                    // Lấy chi tiết của phiếu nhập từ bảng bill_detail
+                    getListDetail.setLong(1, billId);
+                    ResultSet detailsResultSet = getListDetail.executeQuery();
+                    while (detailsResultSet.next()) {
+                        long detailId = detailsResultSet.getLong(" Bill_Detail_Id");
+                        String productId = detailsResultSet.getString("Product_Id");
+                        int quantity = detailsResultSet.getInt("Quantity");
+                        float price = detailsResultSet.getFloat("Price");
+                        // Tạo đối tượng BillDetails từ dữ liệu lấy từ bảng bill_detail
+                        BillDetails detail = new BillDetails(detailId, billId, productId, quantity, price);
+                        billDetails.add(detail);
+                    }
+
+                    // Tạo đối tượng Bill và set thông tin chi tiết
+                    Bill bill = new Bill(billId, billCode, billType, empIdCreated, created, empIdAuth, null, billStatus);
+                    bill.setDetails(billDetails);
+
+                    return bill;
                 }
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -50,7 +72,29 @@ public class ReceiptDAO{
                     java.util.Date created = rs.getDate("Created");
                     String empIdAuth = rs.getString("Emp_id_auth");
                     byte billStatus = rs.getByte("Bill_Status");
-                    return new Bill(billCode, billType, empIdCreated, created, empIdAuth, billStatus);
+
+                    // Lấy chi tiết của phiếu nhập từ bảng bill_detail
+                    String getDetailSQL = "SELECT * FROM bill_detail WHERE Bill_id = ?";
+                    try (PreparedStatement getListDetail = connection.prepareStatement(getDetailSQL)) {
+                        List<BillDetails> billDetails = new ArrayList<>();
+                        getListDetail.setLong(1, billId);
+                        ResultSet detailsResultSet = getListDetail.executeQuery();
+                        while (detailsResultSet.next()) {
+                            long detailId = detailsResultSet.getLong("Bill_Detail_Id");
+                            String productId = detailsResultSet.getString("Product_Id");
+                            int quantity = detailsResultSet.getInt("Quantity");
+                            float price = detailsResultSet.getFloat("Price");
+                            // Tạo đối tượng BillDetails từ dữ liệu lấy từ bảng bill_detail
+                            BillDetails detail = new BillDetails(detailId, billId, productId, quantity, price);
+                            billDetails.add(detail);
+                        }
+
+                        // Tạo đối tượng Bill và set thông tin chi tiết
+                        Bill bill = new Bill(billId, billCode, billType, empIdCreated, created, empIdAuth, null, billStatus);
+                        bill.setDetails(billDetails);
+
+                        return bill;
+                    }
                 }
             } catch (SQLException ex) {
                 ex.printStackTrace();
@@ -100,14 +144,13 @@ public class ReceiptDAO{
 
     public boolean createReceipt(Bill bill) {
         // Tạo mới một phiếu nhập trong cơ sở dữ liệu
-        String sql = "INSERT INTO bill (Bill_Code, Bill_Type, Emp_Id_Created, Created, Emp_id_auth, Bill_Status) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO bill (Bill_Code, Bill_Type, Emp_Id_Created, Created, Emp_id_auth, Bill_Status) VALUES (?, ?, ?, ?, '', ?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, bill.getBillCode());
             ps.setBoolean(2, bill.isBillType());
             ps.setString(3, bill.getEmpIdCreated());
             ps.setDate(4, new java.sql.Date(bill.getCreated().getTime()));
-            ps.setString(5, bill.getEmpIdAuth());
-            ps.setByte(6, bill.getBillStatus());
+            ps.setByte(5, bill.getBillStatus());
 
             int affectedRows = ps.executeUpdate();
             if (affectedRows == 0) {
@@ -208,6 +251,17 @@ public class ReceiptDAO{
             } catch (SQLException ex) {
                 ex.printStackTrace();
             }
+        }
+    }
+
+    public void updateBillDetailStatus(String billCode, byte status) {
+        String sql = "UPDATE bill SET Bill_Status = ? WHERE Bill_Code = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setByte(1, status);
+            ps.setString(2, billCode);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 

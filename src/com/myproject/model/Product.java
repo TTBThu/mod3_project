@@ -13,12 +13,20 @@ public class Product {
 
     public Product() {}
 
-    public Product(String productId, String productName, String manufacturer, byte batch, boolean productStatus, Date created) {
+    public Product(String productId, String productName, String manufacturer, byte batch, int quantity, boolean productStatus, Date created) {
         this.productId = productId;
         this.productName = productName;
         this.manufacturer = manufacturer;
         this.batch = batch;
         this.quantity = quantity;
+        this.productStatus = productStatus;
+        this.created = created;
+    }
+    public Product(String productId, String productName, String manufacturer, byte batch, boolean productStatus, Date created) {
+        this.productId = productId;
+        this.productName = productName;
+        this.manufacturer = manufacturer;
+        this.batch = batch;
         this.productStatus = productStatus;
         this.created = created;
     }

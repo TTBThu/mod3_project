@@ -14,19 +14,22 @@ public class ProductDAO {
         this.connection = connection;
     }
 
-    public List<Product> getAllProducts() throws SQLException {
+    public List<Product> getAllProducts(int offset, int limit) throws SQLException {
         List<Product> productList = new ArrayList<>();
-        String query = "SELECT * FROM PRODUCT LIMIT 10";
+        String query = "SELECT * FROM PRODUCT LIMIT ? OFFSET ?";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, limit);
+            preparedStatement.setInt(2, offset);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     String productId = resultSet.getString("Product_Id");
                     String productName = resultSet.getString("Product_Name");
                     String manufacturer = resultSet.getString("Manufacturer");
                     byte batch = resultSet.getByte("Batch");
+                    int quantity = resultSet.getInt("Quantity");
                     boolean productStatus = resultSet.getBoolean("Product_Status");
                     Date created = resultSet.getDate("Created");
-                    Product product = new Product(productId, productName, manufacturer, batch, productStatus, created);
+                    Product product = new Product(productId, productName, manufacturer, batch, quantity, productStatus, created);
                     productList.add(product);
                 }
             }
@@ -67,9 +70,10 @@ public class ProductDAO {
                     String productId = resultSet.getString("Product_Id");
                     String manufacturer = resultSet.getString("Manufacturer");
                     byte batch = resultSet.getByte("Batch");
+                    int quantity = resultSet.getInt("Quantity");
                     boolean productStatus = resultSet.getBoolean("Product_Status");
                     Date created = resultSet.getDate("Created");
-                    Product product = new Product(productId, productName, manufacturer, batch, productStatus, created);
+                    Product product = new Product(productId, productName, manufacturer, batch, quantity, productStatus, created);
                     productList.add(product);
                 }
             }
@@ -98,9 +102,10 @@ public class ProductDAO {
                     String productName = resultSet.getString("Product_Name");
                     String manufacturer = resultSet.getString("Manufacturer");
                     byte batch = resultSet.getByte("Batch");
+                    int quantity = resultSet.getInt("Quantity");
                     boolean productStatus = resultSet.getBoolean("Product_Status");
                     Date created = resultSet.getDate("Created");
-                    Product product = new Product(productId, productName, manufacturer, batch, productStatus, created);
+                    Product product = new Product(productId, productName, manufacturer, batch, quantity, productStatus, created);
                     productList.add(product);
                 }
             }
